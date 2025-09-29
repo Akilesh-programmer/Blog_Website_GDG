@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RootLayout from './layouts/RootLayout';
+import HomePage from './pages/HomePage';
+import BlogDetailPage from './pages/BlogDetailPage';
+import NewBlogPage from './pages/NewBlogPage';
+import AuthPage from './pages/AuthPage';
+import NotFoundPage from './pages/NotFoundPage';
+import { ROUTES } from './routes/paths';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -10,45 +18,23 @@ function App() {
   }, [dark]);
 
   return (
-    <main className="container-page py-10 transition-colors min-h-screen bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-100">
-      <header className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            GDG Blog App
-          </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            Frontend scaffolding in progress.
-          </p>
-        </div>
-        <button
-          onClick={() => setDark((d) => !d)}
-          className="btn-outline"
-          aria-label="Toggle dark mode"
-        >
-          {dark ? "Light" : "Dark"} mode
-        </button>
-      </header>
-      <section className="space-y-4">
-        <h2 className="text-lg font-medium">Upcoming Routes</h2>
-        <ul className="list-disc pl-5 text-sm marker:text-brand-600 space-y-1">
-          <li>Home: blog list</li>
-          <li>Blog detail: /blog/:slug</li>
-          <li>Create: protected form</li>
-          <li>Auth: login / signup</li>
-        </ul>
-        <div className="card">
-          <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-2">
-            Typography sample:
-          </p>
-          <article className="prose-blog">
-            <h3>Design Goals</h3>
-            <p>
-              A clean, distraction-free reading experience with responsive
-              layout, accessible components, and elegant dark mode.
-            </p>
-          </article>
-        </div>
-      </section>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<RootLayout />}> 
+          <Route index element={<HomePage />} />
+          <Route path={ROUTES.BLOG_DETAIL()} element={<BlogDetailPage />} />
+          <Route path={ROUTES.NEW_BLOG} element={<NewBlogPage />} />
+          <Route path={ROUTES.AUTH} element={<AuthPage />} />
+          <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+      <button
+        onClick={() => setDark(d => !d)}
+        className="fixed bottom-4 right-4 btn-outline shadow-sm"
+        aria-label="Toggle dark mode"
+      >
+        {dark ? 'Light' : 'Dark'}
+      </button>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -56,7 +42,7 @@ function App() {
           success: { iconTheme: { primary: '#2ba6e3', secondary: 'white' } }
         }}
       />
-    </main>
+    </BrowserRouter>
   );
 }
 
