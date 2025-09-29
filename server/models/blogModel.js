@@ -22,6 +22,11 @@ const blogSchema = new mongoose.Schema(
       required: [true, "A blog post must have an author name"],
       trim: true,
     },
+    // Reference to owning user (set automatically when authenticated user creates a blog)
+    authorUser: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
     content: {
       type: String,
       required: [true, "A blog post must have content"],

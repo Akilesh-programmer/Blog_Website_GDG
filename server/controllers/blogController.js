@@ -2,6 +2,7 @@ const Blog = require("../models/blogModel");
 const catchAsync = require("../utils/catchAsync");
 const factory = require("./handleFactory");
 const AppError = require("../utils/appError");
+const mongoose = require('mongoose');
 
 // Middleware to set default query params (optional enhancement later)
 exports.aliasRecent = (req, res, next) => {
@@ -77,7 +78,8 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
     data: { blogs }
   });
 });
-exports.getBlog = factory.getOne(Blog);
+// Single blog retrieval with optional population of author user
+exports.getBlog = factory.getOne(Blog, { path: 'authorUser', select: 'name role' });
 
 exports.filterBlogBody = (req, res, next) => {
   if (!req.body || typeof req.body !== 'object') return next();
@@ -89,6 +91,30 @@ exports.filterBlogBody = (req, res, next) => {
   req.body = filtered;
   next();
 };
+
+// If authenticated, attach current user as authorUser on creation
+exports.setAuthorFromUser = (req, _res, next) => {
+  if (req.user && !req.body.authorUser) {
+    req.body.authorUser = req.user._id;
+    // Fallback: if no explicit author string provided, default to user name
+    if (!req.body.author && req.user.name) req.body.author = req.user.name;
+  }
+  next();
+};
+
+// Restrict blog modifications to owner (authorUser) or admin
+exports.restrictBlogOwnership = catchAsync(async (req, _res, next) => {
+  if (!req.user) return next(new AppError('Not authenticated', 401));
+  if (req.user.role === 'admin') return next();
+  const blogId = req.params.id;
+  if (!mongoose.Types.ObjectId.isValid(blogId)) return next(new AppError('Invalid blog ID', 400));
+  const blog = await Blog.findById(blogId).select('authorUser');
+  if (!blog) return next(new AppError('No blog found with that ID', 404));
+  if (!blog.authorUser || blog.authorUser.toString() !== req.user.id) {
+    return next(new AppError('You do not own this blog post', 403));
+  }
+  next();
+});
 
 exports.createBlog = factory.createOne(Blog);
 exports.updateBlog = factory.updateOne(Blog);
