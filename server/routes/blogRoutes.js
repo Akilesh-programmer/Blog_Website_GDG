@@ -10,6 +10,9 @@ router
 
 router.get("/tag/:tag", blogController.getBlogsByTag);
 
+// Slug route (must be before :id if patterns could overlap)
+router.get("/slug/:slug", blogController.getBlogBySlug);
+
 router
   .route("/:id")
   .get(blogController.getBlog)

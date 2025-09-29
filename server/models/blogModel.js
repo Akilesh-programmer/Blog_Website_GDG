@@ -13,7 +13,10 @@ const blogSchema = new mongoose.Schema(
       ],
       minlength: [3, "A blog title must have more or equal than 3 characters"],
     },
-    slug: String,
+    slug: {
+      type: String,
+      index: true,
+    },
     author: {
       type: String,
       required: [true, "A blog post must have an author name"],
@@ -44,12 +47,19 @@ const blogSchema = new mongoose.Schema(
   }
 );
 
-blogSchema.index({ slug: 1 });
+blogSchema.index({ slug: 1 }, { unique: true });
 blogSchema.index({ createdAt: -1 });
 
-blogSchema.pre("save", function (next) {
+blogSchema.pre("save", async function (next) {
   if (!this.isModified("title")) return next();
-  this.slug = slugify(this.title, { lower: true, strict: true });
+  const base = slugify(this.title, { lower: true, strict: true });
+  let candidate = base;
+  let counter = 1;
+  // Collision handling
+  while (await this.constructor.findOne({ slug: candidate })) {
+    candidate = `${base}-${counter++}`;
+  }
+  this.slug = candidate;
   next();
 });
 
@@ -64,4 +74,13 @@ blogSchema.pre("save", function (next) {
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
+
+// Virtual excerpt (first 180 chars plain text)
+blogSchema.virtual("excerpt").get(function () {
+  if (!this.content) return "";
+  return (
+    this.content.replace(/\n+/g, " ").slice(0, 180) +
+    (this.content.length > 180 ? "…" : "")
+  );
+});
 module.exports = Blog;

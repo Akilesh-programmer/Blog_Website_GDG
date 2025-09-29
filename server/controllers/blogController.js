@@ -25,3 +25,17 @@ exports.getBlogsByTag = catchAsync(async (req, res, next) => {
     data: { blogs },
   });
 });
+
+// Get blog by slug (more frontend-friendly than id)
+exports.getBlogBySlug = catchAsync(async (req, res, next) => {
+  const blog = await Blog.findOne({ slug: req.params.slug });
+  if (!blog) {
+    return next(
+      new (require("../utils/appError"))("No blog found with that slug", 404)
+    );
+  }
+  res.status(200).json({
+    status: "success",
+    data: { blog },
+  });
+});
