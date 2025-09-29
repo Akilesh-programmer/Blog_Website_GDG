@@ -34,4 +34,15 @@ router
     blogController.deleteBlog
   );
 
+// Likes
+router.post("/:id/like", authController.protect, blogController.toggleLike);
+
+// Comments
+router.post("/:id/comments", authController.protect, blogController.addComment);
+router.delete(
+  "/:id/comments/:commentId",
+  authController.protect,
+  blogController.deleteComment
+);
+
 module.exports = router;

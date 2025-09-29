@@ -45,6 +45,22 @@ const blogSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Users who liked the post (for quick toggle). Using array for simplicity.
+    likes: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ],
+    // Embedded comments (lightweight for this task). Could be normalized later.
+    comments: [
+      {
+        user: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        authorName: { type: String, trim: true }, // fallback display name if user ref not populated
+        content: { type: String, required: true, minlength: 1, maxlength: 2000 },
+        createdAt: { type: Date, default: Date.now }
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
