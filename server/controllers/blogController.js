@@ -1,6 +1,7 @@
 const Blog = require("../models/blogModel");
 const catchAsync = require("../utils/catchAsync");
 const factory = require("./handleFactory");
+const AppError = require("../utils/appError");
 
 // Middleware to set default query params (optional enhancement later)
 exports.aliasRecent = (req, res, next) => {
@@ -77,6 +78,18 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
   });
 });
 exports.getBlog = factory.getOne(Blog);
+
+exports.filterBlogBody = (req, res, next) => {
+  if (!req.body || typeof req.body !== 'object') return next();
+  const allowed = ['title', 'author', 'content', 'tags', 'coverImage', 'isPublished'];
+  const filtered = {};
+  allowed.forEach(f => {
+    if (Object.prototype.hasOwnProperty.call(req.body, f)) filtered[f] = req.body[f];
+  });
+  req.body = filtered;
+  next();
+};
+
 exports.createBlog = factory.createOne(Blog);
 exports.updateBlog = factory.updateOne(Blog);
 exports.deleteBlog = factory.deleteOne(Blog);
@@ -96,9 +109,7 @@ exports.getBlogsByTag = catchAsync(async (req, res, next) => {
 exports.getBlogBySlug = catchAsync(async (req, res, next) => {
   const blog = await Blog.findOne({ slug: req.params.slug });
   if (!blog) {
-    return next(
-      new (require("../utils/appError"))("No blog found with that slug", 404)
-    );
+    return next(new AppError("No blog found with that slug", 404));
   }
   res.status(200).json({
     status: "success",
