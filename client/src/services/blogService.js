@@ -1,4 +1,4 @@
-import api from './apiClient';
+import api from "./apiClient";
 
 // Shape helpers / query builders
 export const getBlogs = (params = {}) => {
@@ -6,18 +6,24 @@ export const getBlogs = (params = {}) => {
   const query = { ...params };
   // Ensure minimal listing by default for list views
   if (query.minimal === undefined) query.minimal = true;
-  return api.get('/blogs', { params: query });
+  return api.get("/blogs", { params: query });
 };
 
-export const getBlogBySlug = (slug) => api.get(`/blogs/slug/${encodeURIComponent(slug)}`);
+export const getBlogBySlug = (slug) =>
+  api.get(`/blogs/slug/${encodeURIComponent(slug)}`);
 
 export const getBlogsByTag = (tag, params = {}) => {
   return api.get(`/blogs/tag/${encodeURIComponent(tag)}`, { params });
 };
 
-export const createBlog = (body) => api.post('/blogs', body);
+export const createBlog = (body) => api.post("/blogs", body);
 export const updateBlog = (id, body) => api.patch(`/blogs/${id}`, body);
 export const deleteBlog = (id) => api.delete(`/blogs/${id}`);
+export const toggleLike = (id) => api.post(`/blogs/${id}/like`);
+export const addComment = (id, content) =>
+  api.post(`/blogs/${id}/comments`, { content });
+export const deleteComment = (id, commentId) =>
+  api.delete(`/blogs/${id}/comments/${commentId}`);
 
 export default {
   getBlogs,
@@ -25,5 +31,8 @@ export default {
   getBlogsByTag,
   createBlog,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  toggleLike,
+  addComment,
+  deleteComment,
 };
