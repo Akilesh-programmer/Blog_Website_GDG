@@ -1,5 +1,22 @@
-* { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, sans-serif; color: #222; background:#fafafa; }
-a { color: inherit; text-decoration: none; }
-img { max-width: 100%; display: block; }
-button { font: inherit; cursor: pointer; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	* { box-sizing: border-box; }
+	body { @apply bg-neutral-50 text-neutral-900 font-sans antialiased; }
+	::selection { @apply bg-brand-300 text-neutral-900; }
+}
+
+@layer components {
+	.container-page { @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8; }
+	.btn-primary { @apply inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium px-4 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
+	.btn-outline { @apply inline-flex items-center gap-2 rounded-md border border-neutral-300 hover:bg-neutral-100 text-neutral-800 text-sm font-medium px-4 py-2 transition-colors dark:border-neutral-600 dark:hover:bg-neutral-700 dark:text-neutral-100; }
+	.card { @apply rounded-lg border border-neutral-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow dark:bg-neutral-800 dark:border-neutral-700; }
+	.prose-blog { @apply prose prose-neutral max-w-none dark:prose-invert prose-headings:font-semibold prose-a:text-brand-600 hover:prose-a:text-brand-500; }
+}
+
+@layer utilities {
+	.flex-center { @apply flex items-center justify-center; }
+}
