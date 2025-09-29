@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -48,6 +49,13 @@ function App() {
           </article>
         </div>
       </section>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: { fontSize: '0.85rem', borderRadius: '6px' },
+          success: { iconTheme: { primary: '#2ba6e3', secondary: 'white' } }
+        }}
+      />
     </main>
   );
 }
