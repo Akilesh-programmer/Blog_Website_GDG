@@ -16,13 +16,20 @@ const userRouter = require("./routes/userRoutes");
 // Start express app
 const app = express();
 
-app.enable("trust proxy");
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1); // one proxy hop (e.g., load balancer)
+}
 
 // 1) GLOBAL MIDDLEWARES
-// Implement CORS
-app.use(cors());
-
-app.options(/.*/, cors());
+// Implement fine-grained CORS (wildcard * cannot be used with credentials)
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+  methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
+app.options(/.*/, cors({ origin: FRONTEND_ORIGIN, credentials: true }));
 
 // Set security HTTP headers
 app.use(helmet());
