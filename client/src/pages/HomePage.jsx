@@ -101,7 +101,6 @@ export default function HomePage() {
           and developers
         </p>
       </div>
-
       {/* Search and Filters */}
       <div className="card p-6">
         <form
@@ -414,42 +413,46 @@ export default function HomePage() {
           )}
         </form>
       </div>
-
       {/* Loading State */}
       {loading && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between">
-            <div className="skeleton h-6 w-32"></div>
-            <div className="skeleton h-4 w-20"></div>
+            <div className="skeleton shimmer-loading h-6 w-32"></div>
+            <div className="skeleton shimmer-loading h-4 w-20"></div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => i).map((id) => (
               <div
                 key={`loading-skeleton-${id}`}
-                className="card p-6 space-y-4"
+                className="card p-6 space-y-4 pulse-loading"
+                style={{ animationDelay: `${id * 100}ms` }}
               >
-                <div className="skeleton h-6 w-3/4"></div>
-                <div className="skeleton h-4 w-full"></div>
-                <div className="skeleton h-4 w-2/3"></div>
+                <div className="skeleton shimmer-loading h-6 w-3/4"></div>
+                <div className="skeleton shimmer-loading h-4 w-full"></div>
+                <div className="skeleton shimmer-loading h-4 w-2/3"></div>
                 <div className="flex gap-2">
-                  <div className="skeleton h-5 w-16"></div>
-                  <div className="skeleton h-5 w-20"></div>
+                  <div className="skeleton shimmer-loading h-5 w-16"></div>
+                  <div className="skeleton shimmer-loading h-5 w-20"></div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
-
       {/* Error State */}
       {error && !loading && (
-        <div className="card p-8 border-error-200 bg-error-50 dark:border-error-800 dark:bg-error-950/20">
+        <div
+          className="card p-8 border-error-200 bg-error-50 dark:border-error-800 dark:bg-error-950/20 animate-fade-in"
+          role="alert"
+          aria-live="polite"
+        >
           <div className="flex items-start gap-3">
             <svg
               className="w-6 h-6 text-error-500 flex-shrink-0 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -458,21 +461,26 @@ export default function HomePage() {
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <div>
+            <div className="flex-1">
               <h3 className="font-semibold text-error-800 dark:text-error-200 mb-1">
                 Failed to load posts
               </h3>
-              <p className="text-error-600 dark:text-error-300 text-sm">
+              <p className="text-error-600 dark:text-error-300 text-sm mb-3">
                 {error.message}
               </p>
+              <button
+                onClick={() => load(1, search, genre, sortBy)}
+                className="btn-outline btn-sm"
+              >
+                Try again
+              </button>
             </div>
           </div>
         </div>
-      )}
-
+      )}{" "}
       {/* Empty State */}
       {!loading && !error && blogs.length === 0 && (
-        <div className="card p-12 text-center">
+        <output className="card p-12 text-center animate-fade-in block">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex-center">
             <svg
               className="w-8 h-8 text-gray-400"
@@ -509,9 +517,8 @@ export default function HomePage() {
               Clear filters
             </button>
           )}
-        </div>
+        </output>
       )}
-
       {/* Blog Posts Grid */}
       {!loading && !error && blogs.length > 0 && (
         <div className="space-y-8">
@@ -533,8 +540,14 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {blogs.map((blog) => (
-              <BlogCard key={blog._id || blog.slug} blog={blog} />
+            {blogs.map((blog, index) => (
+              <div
+                key={blog._id || blog.slug}
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <BlogCard blog={blog} />
+              </div>
             ))}
           </div>
 

@@ -49,14 +49,16 @@
 	.btn-primary { 
 		@apply btn-base bg-brand-600 hover:bg-brand-700 active:bg-brand-800;
 		@apply text-white shadow-sm hover:shadow-medium;
-		@apply focus-visible:ring-brand-500;
+		@apply focus-visible:ring-brand-500 active-press;
+		@apply hover:-translate-y-0.5 transition-all duration-200;
 	}
 	
 	.btn-secondary {
 		@apply btn-base bg-gray-100 hover:bg-gray-200 active:bg-gray-300;
 		@apply text-gray-900 shadow-sm hover:shadow-medium;
 		@apply dark:bg-gray-800 dark:hover:bg-gray-700 dark:active:bg-gray-600;
-		@apply dark:text-gray-100 focus-visible:ring-gray-500;
+		@apply dark:text-gray-100 focus-visible:ring-gray-500 active-press;
+		@apply hover:-translate-y-0.5 transition-all duration-200;
 	}
 	
 	.btn-outline { 
@@ -65,7 +67,8 @@
 		@apply shadow-sm hover:shadow-medium;
 		@apply dark:border-gray-600 dark:hover:border-gray-500;
 		@apply dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-gray-200;
-		@apply focus-visible:ring-gray-500;
+		@apply focus-visible:ring-gray-500 active-press;
+		@apply hover:-translate-y-0.5 transition-all duration-200;
 	}
 	
 	.btn-ghost {
@@ -91,8 +94,9 @@
 	
 	.card-interactive {
 		@apply card hover:border-gray-300 cursor-pointer;
-		@apply hover:-translate-y-0.5 active:translate-y-0;
-		@apply dark:hover:border-gray-700;
+		@apply hover:-translate-y-1 active:translate-y-0;
+		@apply dark:hover:border-gray-700 state-transition;
+		@apply hover:shadow-large focus-within:ring-2 focus-within:ring-brand-500/20;
 	}
 	
 	.card-elevated {
@@ -108,12 +112,15 @@
 	.input-base {
 		@apply w-full px-3.5 py-2.5 text-sm rounded-lg border;
 		@apply bg-white border-gray-300 text-gray-900 placeholder-gray-500;
-		@apply focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors;
+		@apply focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all duration-200;
 		@apply dark:bg-gray-900 dark:border-gray-600 dark:text-gray-100;
 		@apply dark:placeholder-gray-400 dark:focus:border-brand-400;
 		@apply disabled:opacity-60 disabled:cursor-not-allowed;
 		/* Enhanced mobile touch targets */
 		@apply min-h-[44px] text-base sm:text-sm;
+		/* Professional interaction feedback */
+		@apply hover:border-gray-400 dark:hover:border-gray-500;
+		@apply focus:scale-[1.01] focus:shadow-medium;
 	}
 	
 	.input-error {
@@ -255,6 +262,52 @@
 	}
 }
 
+/* Professional micro-interactions and animations */
+@keyframes glow {
+	0%, 100% {
+		box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+	}
+	50% {
+		box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+	}
+}
+
+@keyframes pulse-subtle {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+}
+
+@keyframes progress-bar {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes shimmer {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes typewriter {
+	from {
+		width: 0;
+	}
+	to {
+		width: 100%;
+	}
+}
+
 /* Mobile-Specific Optimizations */
 @layer utilities {
 	/* Touch-friendly utilities */
@@ -303,5 +356,69 @@
 	/* Mobile-optimized shadows */
 	.mobile-shadow {
 		@apply shadow-sm sm:shadow-medium;
+	}
+	
+	/* Professional micro-interactions */
+	.hover-lift {
+		@apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium;
+	}
+	
+	.hover-glow:hover {
+		animation: glow 2s ease-in-out infinite;
+	}
+	
+	.pulse-loading {
+		animation: pulse-subtle 1.5s ease-in-out infinite;
+	}
+	
+	.shimmer-loading {
+		@apply relative overflow-hidden;
+	}
+	
+	.shimmer-loading::after {
+		@apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+		content: '';
+		animation: shimmer 2s infinite;
+		transform: translateX(-100%);
+	}
+	
+	/* Enhanced focus states */
+	.focus-ring {
+		@apply focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+		@apply focus-visible:outline-none focus-visible:ring-offset-white;
+		@apply dark:focus-visible:ring-offset-gray-900;
+	}
+	
+	/* Smooth state transitions */
+	.state-transition {
+		@apply transition-all duration-300 ease-in-out;
+	}
+	
+	/* Loading indicators */
+	.loading-dots::after {
+		content: '';
+		animation: dots 1.5s steps(5, end) infinite;
+	}
+	
+	/* Interactive feedback */
+	.active-press {
+		@apply active:scale-95 transition-transform;
+	}
+	
+	/* Professional tooltips */
+	.tooltip {
+		@apply relative;
+	}
+	
+	.tooltip::before {
+		@apply absolute -top-8 left-1/2 transform -translate-x-1/2;
+		@apply px-2 py-1 text-xs rounded bg-gray-900 text-white;
+		@apply opacity-0 pointer-events-none transition-opacity;
+		content: attr(data-tooltip);
+		white-space: nowrap;
+	}
+	
+	.tooltip:hover::before {
+		@apply opacity-100;
 	}
 }

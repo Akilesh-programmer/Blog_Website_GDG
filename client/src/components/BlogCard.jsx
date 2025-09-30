@@ -48,7 +48,7 @@ export default function BlogCard({ blog }) {
     }
   };
   return (
-    <article className="card-interactive p-6 h-full flex flex-col group">
+    <article className="card-interactive p-6 h-full flex flex-col group hover-lift">
       <header className="mb-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1">
@@ -72,7 +72,7 @@ export default function BlogCard({ blog }) {
             <button
               onClick={handleBookmark}
               disabled={busy}
-              className={`p-2 rounded-lg transition-all hover:scale-105 ${
+              className={`p-2 rounded-lg transition-all hover:scale-105 active-press focus-ring ${
                 bookmarked
                   ? "text-brand-600 bg-brand-50 hover:bg-brand-100 dark:bg-brand-950/50 dark:text-brand-400"
                   : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800"

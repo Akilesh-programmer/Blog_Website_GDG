@@ -167,7 +167,8 @@ export default function NewBlogPage() {
               <button
                 disabled={submitting}
                 type="submit"
-                className="btn-primary btn-lg flex-1 sm:flex-none"
+                className="btn-primary btn-lg flex-1 sm:flex-none focus-ring"
+                aria-describedby={submitting ? "publishing-status" : undefined}
               >
                 {submitting ? (
                   <>

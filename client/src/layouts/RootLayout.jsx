@@ -157,7 +157,9 @@ export default function RootLayout() {
         className="flex-1 container-page py-8 md:py-12 safe-area-padding safe-area-bottom"
         id="main-content"
       >
-        <Outlet />
+        <div className="animate-fade-in">
+          <Outlet />
+        </div>
       </main>
       <footer className="mt-16 py-12 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
         <div className="container-page">
