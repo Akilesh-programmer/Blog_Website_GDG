@@ -76,69 +76,71 @@ export default function BookmarksPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-display-md text-gray-900 dark:text-gray-100">
-            Bookmarked Posts
-          </h1>
-          <p className="text-body-sm mt-2">
-            Your saved articles for later reading
-          </p>
+    <div className="max-w-7xl mx-auto mobile-padding">
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-display-md text-gray-900 dark:text-gray-100">
+              Bookmarked Posts
+            </h1>
+            <p className="text-body-sm mt-2">
+              Your saved articles for later reading
+            </p>
+          </div>
+          {bookmarks.length > 0 && (
+            <div className="flex items-center gap-2 text-body-sm">
+              <svg
+                className="w-4 h-4 text-brand-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+              </svg>
+              <span>
+                {bookmarks.length} bookmark{bookmarks.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
         </div>
-        {bookmarks.length > 0 && (
-          <div className="flex items-center gap-2 text-body-sm">
-            <svg
-              className="w-4 h-4 text-brand-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-            </svg>
-            <span>
-              {bookmarks.length} bookmark{bookmarks.length !== 1 ? "s" : ""}
-            </span>
+
+        {/* Content */}
+        {bookmarks.length === 0 ? (
+          <div className="card p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-brand-100 dark:bg-brand-950/50 flex-center">
+              <svg
+                className="w-8 h-8 text-brand-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              No bookmarks yet
+            </h3>
+            <p className="text-body-sm mb-6 max-w-md mx-auto">
+              Start bookmarking posts you'd like to read later. You can bookmark
+              posts by clicking the bookmark icon on any post.
+            </p>
+            <Link to="/" className="btn-primary">
+              Explore Posts
+            </Link>
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {bookmarks.map((bookmark) => (
+              <BlogCard key={bookmark._id} blog={bookmark} />
+            ))}
           </div>
         )}
       </div>
-
-      {/* Content */}
-      {bookmarks.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-brand-100 dark:bg-brand-950/50 flex-center">
-            <svg
-              className="w-8 h-8 text-brand-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No bookmarks yet
-          </h3>
-          <p className="text-body-sm mb-6 max-w-md mx-auto">
-            Start bookmarking posts you'd like to read later. You can bookmark
-            posts by clicking the bookmark icon on any post.
-          </p>
-          <Link to="/" className="btn-primary">
-            Explore Posts
-          </Link>
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {bookmarks.map((bookmark) => (
-            <BlogCard key={bookmark._id} blog={bookmark} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

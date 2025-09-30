@@ -50,49 +50,7 @@ export default function BlogCard({ blog }) {
 
   return (
     <div className="relative">
-      {/* Engagement Stats - Outside the card */}
-      {(blog.likesCount > 0 || blog.commentsCount > 0) && (
-        <div className="flex items-center gap-4 text-caption mb-2 px-2">
-          {blog.likesCount > 0 && (
-            <div className="flex items-center gap-1">
-              <svg
-                className="w-4 h-4 text-red-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-gray-600 dark:text-gray-400 font-medium">
-                {blog.likesCount}
-              </span>
-            </div>
-          )}
-          {blog.commentsCount > 0 && (
-            <div className="flex items-center gap-1">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-              <span className="text-gray-600 dark:text-gray-400 font-medium">
-                {blog.commentsCount}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+
 
       {/* Main Card - Fully Clickable */}
       <Link to={ROUTES.BLOG_DETAIL(blog.slug)} className="block">
@@ -198,6 +156,58 @@ export default function BlogCard({ blog }) {
                 )}
               </div>
             )}
+
+            {/* Engagement Stats - Always visible inside card */}
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-4 text-caption">
+                {/* Likes */}
+                <div className="flex items-center gap-1">
+                  <svg
+                    className={`w-4 h-4 ${blog.likesCount > 0 ? 'text-red-500' : 'text-gray-300 dark:text-gray-600'}`}
+                    fill={blog.likesCount > 0 ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                  <span className={`font-medium ${blog.likesCount > 0 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                    {blog.likesCount || 0}
+                  </span>
+                </div>
+
+                {/* Comments */}
+                <div className="flex items-center gap-1">
+                  <svg
+                    className={`w-4 h-4 ${blog.commentsCount > 0 ? 'text-blue-500' : 'text-gray-300 dark:text-gray-600'}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                  <span className={`font-medium ${blog.commentsCount > 0 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                    {blog.commentsCount || 0}
+                  </span>
+                </div>
+              </div>
+
+              {/* Read time indicator */}
+              {blog.estimatedReadTime && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  {blog.estimatedReadTime} min read
+                </span>
+              )}
+            </div>
           </footer>
         </article>
       </Link>

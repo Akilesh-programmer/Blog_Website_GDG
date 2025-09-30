@@ -95,7 +95,9 @@ export default function HomePage() {
   return (
     <div
       className={`mobile-space lg:space-y-8 ${
-        mobileFullWidth ? "sm:max-w-none sm:px-2" : "sm:max-w-6xl sm:mx-auto"
+        mobileFullWidth
+          ? "max-w-none px-2 sm:max-w-6xl sm:mx-auto sm:px-6 lg:px-8"
+          : "max-w-6xl mx-auto mobile-padding"
       }`}
     >
       {/* Mobile Width Toggle - Only visible on mobile */}
