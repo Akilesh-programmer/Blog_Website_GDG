@@ -11,12 +11,12 @@ exports.aliasRecent = (req, res, next) => {
   next();
 };
 
-// List blogs with pagination, optional search and minimal mode
+// List blogs with advanced filtering, search and sorting
 exports.getAllBlogs = catchAsync(async (req, res, next) => {
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
   const skip = (page - 1) * limit;
-  const sort = req.query.sort || "-createdAt";
+  let sort = req.query.sort || "-createdAt";
   const minimal = req.query.minimal === "true";
   const selectFields = req.query.fields
     ? req.query.fields.split(",").join(" ")
@@ -38,24 +38,88 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
   if (req.query.genre) {
     filter.genre = req.query.genre.trim();
   }
+  // Alternate alias (?category=...)
+  if (req.query.category && !filter.genre) {
+    filter.genre = req.query.category.trim();
+  }
 
-  // Basic search (?q=keyword) - case-insensitive title or content prefix/contains
+  // Date range (?from=YYYY-MM-DD&to=YYYY-MM-DD)
+  if (req.query.from || req.query.to) {
+    filter.createdAt = {};
+    if (req.query.from) {
+      const d = new Date(req.query.from);
+      if (!isNaN(d)) filter.createdAt.$gte = d;
+    }
+    if (req.query.to) {
+      const d = new Date(req.query.to);
+      if (!isNaN(d)) {
+        // include entire day
+        d.setHours(23, 59, 59, 999);
+        filter.createdAt.$lte = d;
+      }
+    }
+    if (Object.keys(filter.createdAt).length === 0) delete filter.createdAt;
+  }
+
+  // Popularity filters
+  if (req.query.minLikes) {
+    const ml = parseInt(req.query.minLikes, 10);
+    if (!isNaN(ml) && ml > 0) filter.likesCount = { $gte: ml };
+  }
+  if (req.query.minComments) {
+    const mc = parseInt(req.query.minComments, 10);
+    if (!isNaN(mc) && mc > 0) filter.commentsCount = { $gte: mc };
+  }
+
+  // Read time range
+  if (req.query.minRead || req.query.maxRead) {
+    filter.estimatedReadTime = {};
+    if (req.query.minRead) {
+      const r = parseInt(req.query.minRead, 10);
+      if (!isNaN(r)) filter.estimatedReadTime.$gte = r;
+    }
+    if (req.query.maxRead) {
+      const r = parseInt(req.query.maxRead, 10);
+      if (!isNaN(r)) filter.estimatedReadTime.$lte = r;
+    }
+    if (Object.keys(filter.estimatedReadTime).length === 0)
+      delete filter.estimatedReadTime;
+  }
+
+  // Full-text search (?q=query) using text index; fallback to regex if necessary
+  let textScoreProjection = null;
   if (req.query.q) {
     const q = req.query.q.trim();
-    filter.$or = [
-      { title: { $regex: q, $options: "i" } },
-      { content: { $regex: q, $options: "i" } },
-    ];
+    if (q.length) {
+      // Use $text search; Mongo will leverage index
+      filter.$text = { $search: q };
+      // If user hasn't explicitly set sort, sort by relevance first then createdAt
+      if (!req.query.sort) {
+        sort = { score: { $meta: "textScore" }, createdAt: -1 };
+      }
+      textScoreProjection = { score: { $meta: "textScore" } };
+    }
   }
+
+  // Sort aliases
+  const SORT_ALIASES = {
+    recent: "-createdAt",
+    oldest: "createdAt",
+    popular: "-likesCount",
+    discussion: "-commentsCount",
+  };
+  if (typeof sort === "string" && SORT_ALIASES[sort]) sort = SORT_ALIASES[sort];
 
   const totalItems = await Blog.countDocuments(filter);
   const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   // If requested page beyond range, return empty but with metadata
-  let docsQuery = Blog.find(filter).sort(sort).skip(skip).limit(limit);
+  let docsQuery = Blog.find(filter).skip(skip).limit(limit);
+  if (textScoreProjection) docsQuery = docsQuery.select(textScoreProjection);
+  docsQuery = docsQuery.sort(sort);
 
   if (minimal) {
     docsQuery = docsQuery.select(
-      "title author genre createdAt slug estimatedReadTime tags"
+      "title author genre createdAt slug estimatedReadTime tags likesCount commentsCount"
     );
   } else if (selectFields) {
     docsQuery = docsQuery.select(selectFields);
@@ -171,10 +235,10 @@ exports.getBlogBySlug = catchAsync(async (req, res, next) => {
   });
 });
 
-// Toggle like on a blog
+// Toggle like on a blog (maintains likesCount)
 exports.toggleLike = catchAsync(async (req, res, next) => {
   if (!req.user) return next(new AppError("Not authenticated", 401));
-  const blog = await Blog.findById(req.params.id).select("likes");
+  const blog = await Blog.findById(req.params.id).select("likes likesCount");
   if (!blog) return next(new AppError("No blog found with that ID", 404));
   const userId = req.user._id;
   const idx = blog.likes.findIndex((u) => u.toString() === userId.toString());
@@ -186,37 +250,48 @@ exports.toggleLike = catchAsync(async (req, res, next) => {
     blog.likes.push(userId);
     action = "liked";
   }
+  blog.likesCount = blog.likes.length;
   await blog.save({ validateBeforeSave: false });
   res
     .status(200)
-    .json({ status: "success", action, likesCount: blog.likes.length });
+    .json({ status: "success", action, likesCount: blog.likesCount });
 });
 
-// Add a comment
+// Add a comment (maintains commentsCount)
 exports.addComment = catchAsync(async (req, res, next) => {
   if (!req.user) return next(new AppError("Not authenticated", 401));
   const { content } = req.body;
   if (!content || !content.trim())
     return next(new AppError("Comment content required", 400));
-  const blog = await Blog.findById(req.params.id).select("comments");
+  const blog = await Blog.findById(req.params.id).select(
+    "comments commentsCount"
+  );
   if (!blog) return next(new AppError("No blog found with that ID", 404));
   blog.comments.push({
     user: req.user._id,
     authorName: req.user.name,
     content: content.trim(),
   });
+  blog.commentsCount = blog.comments.length;
   await blog.save();
   const newComment = blog.comments[blog.comments.length - 1];
-  res.status(201).json({ status: "success", data: { comment: newComment } });
+  res
+    .status(201)
+    .json({
+      status: "success",
+      data: { comment: newComment, commentsCount: blog.commentsCount },
+    });
 });
 
-// Delete a comment (by comment author, blog owner, or admin)
+// Delete a comment (by comment author, blog owner, or admin) maintaining commentsCount
 exports.deleteComment = catchAsync(async (req, res, next) => {
   if (!req.user) return next(new AppError("Not authenticated", 401));
   const { id, commentId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id))
     return next(new AppError("Invalid blog ID", 400));
-  const blog = await Blog.findById(id).select("comments authorUser");
+  const blog = await Blog.findById(id).select(
+    "comments authorUser commentsCount"
+  );
   if (!blog) return next(new AppError("No blog found with that ID", 404));
   const comment = blog.comments.id(commentId);
   if (!comment) return next(new AppError("No comment found with that ID", 404));
@@ -230,6 +305,7 @@ exports.deleteComment = catchAsync(async (req, res, next) => {
     );
   }
   comment.remove();
+  blog.commentsCount = blog.comments.length - 1; // after removal length not yet saved
   await blog.save();
   res.status(204).json({ status: "success", data: null });
 });

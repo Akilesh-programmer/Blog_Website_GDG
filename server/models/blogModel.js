@@ -25,7 +25,7 @@ const blogSchema = new mongoose.Schema(
     genre: {
       type: String,
       trim: true,
-      required: [true, 'A blog post must have a genre']
+      required: [true, "A blog post must have a genre"],
     },
     // Reference to owning user (set automatically when authenticated user creates a blog)
     authorUser: {
@@ -54,18 +54,33 @@ const blogSchema = new mongoose.Schema(
     likes: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: 'User'
-      }
+        ref: "User",
+      },
     ],
+    likesCount: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
     // Embedded comments (lightweight for this task). Could be normalized later.
     comments: [
       {
-        user: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        user: { type: mongoose.Schema.ObjectId, ref: "User" },
         authorName: { type: String, trim: true }, // fallback display name if user ref not populated
-        content: { type: String, required: true, minlength: 1, maxlength: 2000 },
-        createdAt: { type: Date, default: Date.now }
-      }
-    ]
+        content: {
+          type: String,
+          required: true,
+          minlength: 1,
+          maxlength: 2000,
+        },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    commentsCount: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -75,6 +90,10 @@ const blogSchema = new mongoose.Schema(
 
 blogSchema.index({ slug: 1 }, { unique: true });
 blogSchema.index({ createdAt: -1 });
+// Full-text index (title, content, tags) for relevance search
+blogSchema.index({ title: "text", content: "text", tags: "text" });
+// Popularity compound (optional queries combining)
+blogSchema.index({ likesCount: -1, commentsCount: -1 });
 
 blogSchema.pre("save", async function (next) {
   if (!this.isModified("title")) return next();
@@ -96,6 +115,9 @@ blogSchema.pre("save", function (next) {
     // Approx 200 wpm reading speed
     this.estimatedReadTime = Math.ceil(words / 200);
   }
+  // Ensure counters in sync if arrays present (initial creation safety)
+  if (this.isModified("likes")) this.likesCount = this.likes.length;
+  if (this.isModified("comments")) this.commentsCount = this.comments.length;
   next();
 });
 
