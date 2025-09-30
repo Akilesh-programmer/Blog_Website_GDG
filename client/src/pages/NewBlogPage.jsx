@@ -49,7 +49,7 @@ export default function NewBlogPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mobile-padding">
+    <div className="max-w-6xl mx-auto mobile-padding">
       <div className="mobile-space lg:space-y-8">
         {/* Header */}
         <div className="text-center">

@@ -173,7 +173,7 @@ export default function RootLayout() {
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-500">
-              © {new Date().getFullYear()} Built with ❤️ for GDG Selection Task
+              © {new Date().getFullYear()} GDG Blog Platform
             </p>
           </div>
         </div>

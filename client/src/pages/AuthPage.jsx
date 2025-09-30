@@ -33,7 +33,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mobile-padding">
+    <div className="max-w-lg mx-auto mobile-padding">
       <div className="mobile-space lg:space-y-8">
         {/* Header */}
         <div className="text-center">

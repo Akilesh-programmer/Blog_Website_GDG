@@ -22,6 +22,9 @@ export default function HomePage() {
   const [minReadTime, setMinReadTime] = useState("");
   const [maxReadTime, setMaxReadTime] = useState("");
 
+  // Mobile layout toggle
+  const [mobileFullWidth, setMobileFullWidth] = useState(false);
+
   const load = useCallback(
     (p = page, q = search, g = genre, sort = sortBy, filters = {}) => {
       const params = {
@@ -90,7 +93,38 @@ export default function HomePage() {
   const meta = data?.metadata;
 
   return (
-    <div className="mobile-space lg:space-y-8">
+    <div
+      className={`mobile-space lg:space-y-8 ${
+        mobileFullWidth ? "sm:max-w-none sm:px-2" : "sm:max-w-6xl sm:mx-auto"
+      }`}
+    >
+      {/* Mobile Width Toggle - Only visible on mobile */}
+      <div className="sm:hidden flex justify-end mb-4">
+        <button
+          onClick={() => setMobileFullWidth(!mobileFullWidth)}
+          className="btn-secondary btn-sm flex items-center gap-2"
+          title={mobileFullWidth ? "Constrain width" : "Full width"}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={
+                mobileFullWidth
+                  ? "M9 9V4.5M9 9H4.5M9 9L3.75 3.75M15 15v4.5M15 15h4.5M15 15l5.25 5.25"
+                  : "M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+              }
+            />
+          </svg>
+          {mobileFullWidth ? "Fit" : "Full"}
+        </button>
+      </div>
       {/* Hero Section */}
       <div className="text-center py-8 md:py-12">
         <h1 className="text-display-lg text-gray-900 dark:text-gray-100 mb-4">
