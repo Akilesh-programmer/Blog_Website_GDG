@@ -77,7 +77,7 @@ Modern full‑stack blog platform built with a secure Express/MongoDB backend an
 
 ## 📄 API Overview (v1)
 
-Base URL (dev): `http://localhost:5000/api/v1`
+Base URL (dev): `http://localhost:3000/api/v1`
 
 | Method | Endpoint                       | Description      | Auth   | Notes                                                   |
 | ------ | ------------------------------ | ---------------- | ------ | ------------------------------------------------------- |
@@ -160,7 +160,7 @@ cd server
 npm run dev
 ```
 
-Backend starts on port 5000 by default (per implementation). Adjust if needed.
+Backend starts on port 3000 by default (see `server/server.js` or set `PORT` in `config.env`). Adjust if needed.
 
 ### 6. Run Frontend (Dev)
 
@@ -179,7 +179,7 @@ You may create a `.env` in `client/` if deploying to a different backend origin:
 VITE_API_BASE_URL=https://your-deployment.example.com/api/v1
 ```
 
-If omitted, the frontend attempts `http://localhost:5000/api/v1`.
+If omitted, the frontend attempts `http://localhost:3000/api/v1` (fallback in `apiClient`).
 
 ## 🛠 NPM Scripts
 
