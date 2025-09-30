@@ -18,8 +18,9 @@ export default function BlogCard({ blog }) {
     try {
       // Could be optimized by global state; simple request for now
       const res = await getBookmarks();
-      const list = res.data?.bookmarks || res.bookmarks || res.data?.data?.bookmarks || [];
-      setBookmarked(list.some(b => b._id === blog._id));
+      const list =
+        res.data?.bookmarks || res.bookmarks || res.data?.data?.bookmarks || [];
+      setBookmarked(list.some((b) => b._id === blog._id));
     } catch (_) {
       /* silent */
     }
@@ -38,10 +39,10 @@ export default function BlogCard({ blog }) {
     setBusy(true);
     try {
       const r = await toggleBookmark(blog._id);
-      if (r.action === 'added') setBookmarked(true);
-      else if (r.action === 'removed') setBookmarked(false);
+      if (r.action === "added") setBookmarked(true);
+      else if (r.action === "removed") setBookmarked(false);
     } catch (e) {
-      notifyError(e.message || 'Failed to toggle bookmark');
+      notifyError(e.message || "Failed to toggle bookmark");
     } finally {
       setBusy(false);
     }
@@ -75,11 +76,15 @@ export default function BlogCard({ blog }) {
               <button
                 onClick={handleBookmark}
                 disabled={busy}
-                className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition ${bookmarked ? 'text-brand-600 border-brand-400 dark:border-brand-500' : ''}`}
+                className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition ${
+                  bookmarked
+                    ? "text-brand-600 border-brand-400 dark:border-brand-500"
+                    : ""
+                }`}
                 aria-pressed={bookmarked}
-                aria-label={bookmarked ? 'Remove bookmark' : 'Add bookmark'}
+                aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
               >
-                {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                {bookmarked ? "Bookmarked" : "Bookmark"}
               </button>
             </>
           )}
