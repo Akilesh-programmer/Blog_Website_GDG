@@ -18,12 +18,18 @@ const baseURL = (() => {
 
 export const api = axios.create({
   baseURL,
-  withCredentials: true, // send cookies for auth
+  withCredentials: false, // Use Bearer tokens instead of cookies for better Vercel compatibility
   headers: {
     "Content-Type": "application/json",
   },
   timeout: 15000,
 });
+
+// Set up token from localStorage on initialization
+const token = localStorage.getItem("authToken");
+if (token) {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 
 if (
   typeof import.meta !== "undefined" &&
