@@ -50,8 +50,6 @@ export default function BlogCard({ blog }) {
 
   return (
     <div className="relative">
-
-
       {/* Main Card - Fully Clickable */}
       <Link to={ROUTES.BLOG_DETAIL(blog.slug)} className="block">
         <article className="card-interactive p-6 h-full flex flex-col group hover-lift relative">
@@ -163,7 +161,11 @@ export default function BlogCard({ blog }) {
                 {/* Likes */}
                 <div className="flex items-center gap-1">
                   <svg
-                    className={`w-4 h-4 ${blog.likesCount > 0 ? 'text-red-500' : 'text-gray-300 dark:text-gray-600'}`}
+                    className={`w-4 h-4 ${
+                      blog.likesCount > 0
+                        ? "text-red-500"
+                        : "text-gray-300 dark:text-gray-600"
+                    }`}
                     fill={blog.likesCount > 0 ? "currentColor" : "none"}
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -175,7 +177,13 @@ export default function BlogCard({ blog }) {
                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                     />
                   </svg>
-                  <span className={`font-medium ${blog.likesCount > 0 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                  <span
+                    className={`font-medium ${
+                      blog.likesCount > 0
+                        ? "text-gray-700 dark:text-gray-300"
+                        : "text-gray-400 dark:text-gray-500"
+                    }`}
+                  >
                     {blog.likesCount || 0}
                   </span>
                 </div>
@@ -183,7 +191,11 @@ export default function BlogCard({ blog }) {
                 {/* Comments */}
                 <div className="flex items-center gap-1">
                   <svg
-                    className={`w-4 h-4 ${blog.commentsCount > 0 ? 'text-blue-500' : 'text-gray-300 dark:text-gray-600'}`}
+                    className={`w-4 h-4 ${
+                      blog.commentsCount > 0
+                        ? "text-blue-500"
+                        : "text-gray-300 dark:text-gray-600"
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -195,7 +207,13 @@ export default function BlogCard({ blog }) {
                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     />
                   </svg>
-                  <span className={`font-medium ${blog.commentsCount > 0 ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                  <span
+                    className={`font-medium ${
+                      blog.commentsCount > 0
+                        ? "text-gray-700 dark:text-gray-300"
+                        : "text-gray-400 dark:text-gray-500"
+                    }`}
+                  >
                     {blog.commentsCount || 0}
                   </span>
                 </div>
