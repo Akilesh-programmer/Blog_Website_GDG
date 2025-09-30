@@ -11,24 +11,27 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
+  const [genre, setGenre] = useState("");
 
   const load = useCallback(
-    (p = page, q = search) => {
-      run((signal) => getBlogs({ page: p, q, minimal: true, signal })).catch(
+    (p = page, q = search, g = genre) => {
+      const params = { page: p, q, minimal: true, signal: undefined };
+      if (g) params.genre = g;
+      run((signal) => getBlogs({ ...params, signal })).catch(
         (err) => notifyError(err.message || "Failed to load blogs")
       );
     },
-    [run, page, search]
+    [run, page, search, genre]
   );
 
   useEffect(() => {
-    load(1, search); /* eslint-disable-next-line */
-  }, [search]);
+    load(1, search, genre); /* eslint-disable-next-line */
+  }, [search, genre]);
   useEffect(() => {
-    load(page, search); /* eslint-disable-next-line */
+    load(page, search, genre); /* eslint-disable-next-line */
   }, [page]);
   useEffect(() => {
-    load(1, search); /* initial */
+    load(1, search, genre); /* initial */
   }, []); // initial load
 
   const blogs = data?.data?.blogs || data?.blogs || []; // depending on interceptor shape
@@ -44,7 +47,7 @@ export default function HomePage() {
             setSearch(query.trim());
             setPage(1);
           }}
-          className="flex items-center gap-2"
+          className="flex flex-wrap items-center gap-2"
           role="search"
         >
           <input
@@ -54,9 +57,26 @@ export default function HomePage() {
             onChange={(e) => setQuery(e.target.value)}
             className="px-3 py-2 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm w-56"
           />
+          <input
+            type="text"
+            placeholder="Genre"
+            value={genre}
+            onChange={(e) => { setGenre(e.target.value.trim()); setPage(1); }}
+            className="px-3 py-2 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm w-40"
+            aria-label="Genre filter"
+          />
           <button type="submit" className="btn-primary text-sm">
-            Search
+            Apply
           </button>
+          {(search || genre) && (
+            <button
+              type="button"
+              onClick={() => { setQuery(""); setSearch(""); setGenre(""); setPage(1); }}
+              className="btn-outline text-sm"
+            >
+              Clear
+            </button>
+          )}
         </form>
       </div>
 

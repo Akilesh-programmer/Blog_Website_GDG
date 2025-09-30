@@ -12,7 +12,7 @@ Modern full‑stack blog platform built with a secure Express/MongoDB backend an
 
 | Area         | Capabilities                                                                                           |
 | ------------ | ------------------------------------------------------------------------------------------------------ |
-| Blogging     | Create, list (paginated + searchable), view by slug, update (author only), delete (author only)        |
+| Blogging     | Create (auto‑author), list (paginated + searchable + genre/tag filters), view by slug, update (author only), delete (author only) |
 | Engagement   | Likes (toggle), comments (add / delete own comment)                                                    |
 | Auth         | Signup, login, logout (httpOnly JWT cookie), protected routes, ownership authorization                 |
 | Security     | Helmet, rate limiting, NoSQL injection + XSS sanitization, cookie flags, centralized error handling    |
@@ -72,38 +72,49 @@ Modern full‑stack blog platform built with a secure Express/MongoDB backend an
 
 - Slug auto-generated from title with collision resolution (incremental suffix).
 - Estimated read time computed server-side.
+- Required `genre` field for coarse classification & filtering (simple string; future enhancement could be enumerated or normalized).
 - Embedded comments (author reference + timestamp) for locality and simpler retrieval on detail view.
 - Likes stored as an array of user ObjectIds (toggle semantics).
+
+### Automatic Author Assignment
+
+The backend now ignores any client-supplied `author` field. During blog creation & updates it derives:
+
+- `authorUser`: ObjectId of the authenticated user (`req.user.id`).
+- `author`: Snapshot of the author's current name (denormalized for faster list rendering and historical consistency if the user later renames themselves).
+
+This removes a forgery vector (impersonating another user's name) and simplifies the client form – no manual author input is needed.
 
 ## 📄 API Overview (v1)
 
 Base URL (dev): `http://localhost:3000/api/v1`
 
-| Method | Endpoint                       | Description      | Auth   | Notes                                                   |
-| ------ | ------------------------------ | ---------------- | ------ | ------------------------------------------------------- |
-| POST   | /users/signup                  | Create user      | Public | Sets JWT cookie                                         |
-| POST   | /users/login                   | Login user       | Public | Sets JWT cookie                                         |
-| GET    | /users/logout                  | Logout user      | Auth   | Clears cookie                                           |
-| GET    | /blogs                         | List blogs       | Public | Query: `page`, `limit`, `search`, `tag`, `minimal=true` |
-| POST   | /blogs                         | Create blog      | Auth   | Body filtered for allowed fields                        |
-| GET    | /blogs/:id                     | Get blog by id   | Public | Populates author                                        |
-| PATCH  | /blogs/:id                     | Update blog      | Author | Ownership enforced                                      |
-| DELETE | /blogs/:id                     | Delete blog      | Author | Soft constraints                                        |
-| GET    | /blogs/slug/:slug              | Get blog by slug | Public | Used by frontend detail                                 |
-| POST   | /blogs/:id/like                | Toggle like      | Auth   | Returns updated blog                                    |
-| POST   | /blogs/:id/comments            | Add comment      | Auth   | Body: `{ text }`                                        |
-| DELETE | /blogs/:id/comments/:commentId | Delete comment   | Auth   | User must own comment                                   |
+| Method | Endpoint                       | Description      | Auth   | Notes                                                                 |
+| ------ | ------------------------------ | ---------------- | ------ | --------------------------------------------------------------------- |
+| POST   | /users/signup                  | Create user      | Public | Sets JWT cookie                                                       |
+| POST   | /users/login                   | Login user       | Public | Sets JWT cookie                                                       |
+| GET    | /users/logout                  | Logout user      | Auth   | Clears cookie                                                         |
+| GET    | /blogs                         | List blogs       | Public | Query: `page`, `limit`, `search`, `tag`, `genre`, `minimal=true`      |
+| POST   | /blogs                         | Create blog      | Auth   | Required fields: `title`, `content`, `genre`; author auto-assigned    |
+| GET    | /blogs/:id                     | Get blog by id   | Public | Populates author                                                      |
+| PATCH  | /blogs/:id                     | Update blog      | Author | Ownership enforced; author cannot be reassigned                       |
+| DELETE | /blogs/:id                     | Delete blog      | Author | Soft constraints                                                      |
+| GET    | /blogs/slug/:slug              | Get blog by slug | Public | Used by frontend detail                                               |
+| POST   | /blogs/:id/like                | Toggle like      | Auth   | Returns updated blog                                                  |
+| POST   | /blogs/:id/comments            | Add comment      | Auth   | Body: `{ text }`                                                      |
+| DELETE | /blogs/:id/comments/:commentId | Delete comment   | Auth   | User must own comment                                                 |
 
 Error responses follow a consistent JSON operational error format via centralized handler.
 
 ## 🔍 Query Parameters (Listing)
 
-`GET /blogs?search=react&page=2&limit=10&minimal=true&tag=frontend`
+`GET /blogs?search=react&page=2&limit=10&minimal=true&tag=frontend&genre=javascript`
 
 - `search`: Case-insensitive partial match on title & content.
 - `page` & `limit`: Pagination controls (defaults applied server-side).
 - `minimal=true`: Reduces payload to listing essentials for performance.
 - `tag`: Filter by tag inclusion.
+ - `genre`: Filter by exact genre match (case-insensitive). When omitted returns all genres.
 
 ## 🧭 Frontend Architecture
 
@@ -208,6 +219,19 @@ If omitted, the frontend attempts `http://localhost:3000/api/v1` (fallback in `a
 - JWT stored in httpOnly cookie (mitigates XSS token theft) with expiration controls.
 - Centralized error handler prevents leaking stack traces in production.
 
+### Rate Limiting Configuration
+
+Defaults:
+- Development: 1000 requests / hour per IP
+- Production: 300 requests / hour per IP
+
+You can override via environment variables (backend):
+```
+RATE_LIMIT_MAX=500
+RATE_LIMIT_WINDOW_MINUTES=30
+```
+This adjusts the max requests and rolling window length without code changes.
+
 ## 📦 Performance Considerations
 
 - Minimal projection on blog list reduces payload for listing view.
@@ -280,9 +304,11 @@ erDiagram
 		string title
 		string slug (unique)
 		string content
+		string genre
 		string[] tags
 		number estimatedReadTime
 		objectId authorUser
+		string author (denormalized author name snapshot)
 		objectId[] likes
 		COMMENT[] comments
 	}

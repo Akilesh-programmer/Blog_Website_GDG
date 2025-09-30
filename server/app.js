@@ -36,13 +36,17 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// Limit requests from same API
+// Rate limiting (configurable via env, relaxed defaults for dev)
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10) || (process.env.NODE_ENV === 'development' ? 1000 : 300);
+const RATE_LIMIT_WINDOW_MINUTES = parseInt(process.env.RATE_LIMIT_WINDOW_MINUTES, 10) || 60; // minutes
 const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: "Too many requests from this IP, please try again in an hour!",
+  max: RATE_LIMIT_MAX,
+  windowMs: RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: `Too many requests from this IP, please try again after the rate limit window.`
 });
-app.use("/api", limiter);
+app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));

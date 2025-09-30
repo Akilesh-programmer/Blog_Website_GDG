@@ -6,7 +6,7 @@ import { ROUTES } from "../routes/paths";
 
 export default function NewBlogPage() {
   const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
+  const [genre, setGenre] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -14,16 +14,16 @@ export default function NewBlogPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !author.trim() || !content.trim()) {
-      notifyError("Title, author and content are required");
+    if (!title.trim() || !content.trim() || !genre.trim()) {
+      notifyError("Title, genre and content are required");
       return;
     }
     setSubmitting(true);
     try {
       const body = {
         title: title.trim(),
-        author: author.trim(),
         content: content.trim(),
+        genre: genre.trim(),
         tags: tags
           .split(",")
           .map((t) => t.trim())
@@ -38,7 +38,7 @@ export default function NewBlogPage() {
       if (slug) navigate(ROUTES.BLOG_DETAIL(slug));
       else navigate(ROUTES.HOME);
       setTitle("");
-      setAuthor("");
+  setGenre("");
       setContent("");
       setTags("");
     } catch (err) {
@@ -64,13 +64,14 @@ export default function NewBlogPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="author">
-            Author
+          <label className="block text-sm font-medium mb-1" htmlFor="genre">
+            Genre
           </label>
           <input
-            id="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
+            id="genre"
+            value={genre}
+            placeholder="e.g. technology"
+            onChange={(e) => setGenre(e.target.value)}
             className="w-full rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
           />
         </div>
@@ -114,7 +115,7 @@ export default function NewBlogPage() {
             type="button"
             onClick={() => {
               setTitle("");
-              setAuthor("");
+              setGenre("");
               setContent("");
               setTags("");
             }}
