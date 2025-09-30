@@ -28,18 +28,21 @@ export default function RootLayout() {
   ].filter((l) => l.show);
 
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
-      <header className="border-b border-neutral-200 dark:border-neutral-800">
-        <div className="container-page flex items-center justify-between h-14">
+    <div className="min-h-screen flex flex-col bg-gray-25 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 glass">
+        <div className="container-page flex items-center justify-between h-16">
           <NavLink
             to={ROUTES.HOME}
-            className="font-semibold tracking-tight text-lg flex items-center gap-2"
+            className="font-bold tracking-tight text-xl flex items-center gap-3 group"
           >
-            <span>GDG Blog</span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex-center text-white font-bold text-sm group-hover:scale-105 transition-transform">
+              G
+            </div>
+            <span className="text-gradient">GDG Blog</span>
           </NavLink>
           {/* Desktop nav */}
           <nav
-            className="hidden sm:flex items-center gap-6 text-sm"
+            className="hidden md:flex items-center gap-1 text-sm"
             role="navigation"
             aria-label="Main navigation"
           >
@@ -48,10 +51,10 @@ export default function RootLayout() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `hover:text-brand-600 transition-colors ${
+                  `px-3 py-2 rounded-lg font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-800 ${
                     isActive
-                      ? "text-brand-600 font-medium"
-                      : "text-neutral-600 dark:text-neutral-300"
+                      ? "text-brand-600 bg-brand-50 dark:bg-brand-950/50 dark:text-brand-400"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                   }`
                 }
               >
@@ -59,14 +62,19 @@ export default function RootLayout() {
               </NavLink>
             ))}
             {user && (
-              <div className="flex items-center gap-3 pl-4 ml-4 border-l border-neutral-200 dark:border-neutral-700">
-                <span
-                  className="text-xs text-neutral-600 dark:text-neutral-400 max-w-[120px] truncate"
-                  title={user.name}
-                >
-                  {user.name}
-                </span>
-                <button onClick={handleLogout} className="btn-outline text-xs">
+              <div className="flex items-center gap-3 pl-4 ml-4 border-l border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex-center text-white text-xs font-semibold">
+                    {user.name?.charAt(0)?.toUpperCase() || "U"}
+                  </div>
+                  <span
+                    className="text-sm text-gray-700 dark:text-gray-300 max-w-[120px] truncate font-medium"
+                    title={user.name}
+                  >
+                    {user.name}
+                  </span>
+                </div>
+                <button onClick={handleLogout} className="btn-outline btn-sm">
                   Logout
                 </button>
               </div>
@@ -74,7 +82,7 @@ export default function RootLayout() {
           </nav>
           {/* Mobile hamburger */}
           <button
-            className="sm:hidden inline-flex items-center justify-center h-9 w-9 rounded border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
@@ -88,6 +96,9 @@ export default function RootLayout() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className={`transform transition-transform ${
+                mobileOpen ? "rotate-90" : ""
+              }`}
             >
               {mobileOpen ? (
                 <path d="M4 4L16 16M16 4L4 16" />
@@ -99,9 +110,9 @@ export default function RootLayout() {
         </div>
         {/* Mobile panel */}
         {mobileOpen && (
-          <div className="sm:hidden border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-800 glass animate-slide-up">
             <nav
-              className="container-page py-4 flex flex-col gap-4"
+              className="container-page py-6 flex flex-col gap-2"
               aria-label="Mobile navigation"
             >
               {navLinks.map((item) => (
@@ -110,10 +121,10 @@ export default function RootLayout() {
                   to={item.to}
                   onClick={closeMobile}
                   className={({ isActive }) =>
-                    `text-sm py-1 ${
+                    `px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                       isActive
-                        ? "text-brand-600 font-medium"
-                        : "text-neutral-700 dark:text-neutral-300"
+                        ? "text-brand-600 bg-brand-50 dark:bg-brand-950/50 dark:text-brand-400"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`
                   }
                 >
@@ -121,17 +132,19 @@ export default function RootLayout() {
                 </NavLink>
               ))}
               {user && (
-                <div className="flex items-center justify-between gap-3 pt-2 border-t border-neutral-200 dark:border-neutral-800">
-                  <span
-                    className="text-xs text-neutral-600 dark:text-neutral-400 truncate"
-                    title={user.name}
-                  >
-                    {user.name}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="btn-outline text-xs"
-                  >
+                <div className="flex items-center justify-between gap-3 pt-4 mt-2 border-t border-gray-200 dark:border-gray-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex-center text-white text-sm font-semibold">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                    <span
+                      className="text-sm text-gray-700 dark:text-gray-300 font-medium"
+                      title={user.name}
+                    >
+                      {user.name}
+                    </span>
+                  </div>
+                  <button onClick={handleLogout} className="btn-outline btn-sm">
                     Logout
                   </button>
                 </div>
@@ -140,11 +153,25 @@ export default function RootLayout() {
           </div>
         )}
       </header>
-      <main className="flex-1 container-page py-8" id="main-content">
+      <main className="flex-1 container-page py-8 md:py-12" id="main-content">
         <Outlet />
       </main>
-      <footer className="mt-10 py-8 text-center text-xs text-neutral-500 dark:text-neutral-400">
-        © {new Date().getFullYear()} GDG Blog. Built for selection task.
+      <footer className="mt-16 py-12 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+        <div className="container-page">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 rounded bg-gradient-to-br from-brand-500 to-brand-700 flex-center text-white font-bold text-xs">
+                G
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                GDG Blog
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-500">
+              © {new Date().getFullYear()} Built with ❤️ for GDG Selection Task
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );
