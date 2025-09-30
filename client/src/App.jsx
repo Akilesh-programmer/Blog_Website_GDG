@@ -5,6 +5,7 @@ import RootLayout from "./layouts/RootLayout";
 import HomePage from "./pages/HomePage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import NewBlogPage from "./pages/NewBlogPage";
+import BookmarksPage from "./pages/BookmarksPage";
 import AuthPage from "./pages/AuthPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { ROUTES } from "./routes/paths";
@@ -28,6 +29,7 @@ function App() {
             <Route path={ROUTES.BLOG_DETAIL()} element={<BlogDetailPage />} />
             <Route element={<RequireAuth />}>
               <Route path={ROUTES.NEW_BLOG} element={<NewBlogPage />} />
+              <Route path={ROUTES.BOOKMARKS} element={<BookmarksPage />} />
             </Route>
             <Route path={ROUTES.AUTH} element={<AuthPage />} />
             <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />

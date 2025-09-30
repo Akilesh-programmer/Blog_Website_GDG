@@ -19,6 +19,7 @@ export default function RootLayout() {
   const navLinks = [
     { to: ROUTES.HOME, label: routeLabels[ROUTES.HOME], show: true },
     { to: ROUTES.NEW_BLOG, label: routeLabels[ROUTES.NEW_BLOG], show: !!user },
+    { to: ROUTES.BOOKMARKS, label: routeLabels[ROUTES.BOOKMARKS], show: !!user },
     { to: ROUTES.AUTH, label: routeLabels[ROUTES.AUTH], show: !user },
   ].filter((l) => l.show);
 

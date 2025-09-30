@@ -1,13 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import {
-  getBlogBySlug,
-  toggleLike,
-  addComment,
-  deleteComment,
-  updateBlog,
-  deleteBlog,
-} from "../services/blogService";
+import { getBlogBySlug, toggleLike, addComment, deleteComment, updateBlog, deleteBlog } from "../services/blogService";
+import { toggleBookmark, getBookmarks } from "../services/userService";
 import { useApi } from "../hooks/useApi";
 import Spinner from "../components/Spinner";
 import { notifyError } from "../utils/toast";
@@ -23,11 +17,8 @@ export default function BlogDetailPage() {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [commentText, setCommentText] = useState("");
-  const [uiState, setUiState] = useState({
-    likeBusy: false,
-    saving: false,
-    deleting: false,
-  });
+  const [uiState, setUiState] = useState({ likeBusy: false, saving: false, deleting: false, bookmarkBusy: false });
+  const [bookmarked, setBookmarked] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -55,6 +46,22 @@ export default function BlogDetailPage() {
       );
     }
   }, [slug, run]);
+
+  const loadBookmarkState = useCallback(async () => {
+    if (!user || !blog?._id) {
+      setBookmarked(false);
+      return;
+    }
+    try {
+      const res = await getBookmarks();
+      const list = res.data?.bookmarks || res.bookmarks || res.data?.data?.bookmarks || [];
+      setBookmarked(list.some(b => b._id === blog._id));
+    } catch (_) {
+      /* silent */
+    }
+  }, [user, blog?._id]);
+
+  useEffect(() => { loadBookmarkState(); }, [loadBookmarkState]);
 
   if (loading)
     return (
@@ -148,6 +155,22 @@ export default function BlogDetailPage() {
         notifyError(e.message || "Failed to delete comment");
       }
     },
+    toggleBookmark: async () => {
+      if (!user) {
+        notifyError('Login to bookmark posts');
+        return;
+      }
+      if (uiState.bookmarkBusy || !blog?._id) return;
+      setUiState(s => ({ ...s, bookmarkBusy: true }));
+      try {
+        const r = await toggleBookmark(blog._id);
+        if (r.action === 'added') setBookmarked(true); else if (r.action === 'removed') setBookmarked(false);
+      } catch (e) {
+        notifyError(e.message || 'Failed to toggle bookmark');
+      } finally {
+        setUiState(s => ({ ...s, bookmarkBusy: false }));
+      }
+    },
   };
 
   return (
@@ -201,6 +224,15 @@ export default function BlogDetailPage() {
               className="btn-outline text-xs"
             >
               Edit
+            </button>
+          )}
+          {user && (
+            <button
+              onClick={actionHandlers.toggleBookmark}
+              disabled={uiState.bookmarkBusy}
+              className={`btn-outline text-xs ${bookmarked ? 'ring-2 ring-brand-500' : ''}`}
+            >
+              {bookmarked ? 'Bookmarked' : 'Bookmark'}
             </button>
           )}
           {isOwner && editing && (
