@@ -1,2 +1,9 @@
 .qodo
 node_modules
+*.env
+exampleController.txt
+exampleModel.txt
+exampleRoutes.txt
+exampleAuthController.txt
+exampleUserModel.txt
+exampleUserRoutes.txt
