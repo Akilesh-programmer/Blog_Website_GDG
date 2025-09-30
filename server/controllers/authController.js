@@ -15,10 +15,16 @@ const createSendToken = (user, statusCode, req, res) => {
   const cookieOptions = {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? undefined : undefined
   };
 
-  res.cookie('jwt', token, cookieOptions);
+  // Only set cookie in development or if explicitly requested
+  if (process.env.NODE_ENV !== 'production' || req.headers['set-cookie-auth']) {
+    res.cookie('jwt', token, cookieOptions);
+  }
+  
   // remove password field
   user.password = undefined;
 
@@ -57,9 +63,10 @@ exports.logout = (req, res) => {
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
+  // Prioritize Authorization header (works better with Vercel/cross-origin)
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
+  } else if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
     token = req.cookies.jwt;
   }
   if (!token) return next(new AppError('You are not logged in! Please log in to get access.', 401));

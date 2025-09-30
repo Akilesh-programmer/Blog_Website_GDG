@@ -18,15 +18,30 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // 1) GLOBAL MIDDLEWARES
-// Implement fine-grained CORS (wildcard * cannot be used with credentials)
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+// Implement CORS with improved production support
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.FRONTEND_ORIGIN,
+  // Add your Vercel frontend URL here when you have it
+].filter(Boolean);
+
 app.use(cors({
-  origin: FRONTEND_ORIGIN,
-  credentials: true,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Still support cookies for development
   methods: ['GET','POST','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  allowedHeaders: ['Content-Type','Authorization','Cookie']
 }));
-app.options(/.*/, cors({ origin: FRONTEND_ORIGIN, credentials: true }));
+app.options(/.*/, cors());
 
 // Set security HTTP headers
 app.use(helmet());
