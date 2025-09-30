@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { getBlogs } from "../services/blogService";
 import { useApi } from "../hooks/useApi";
-import Spinner from "../components/Spinner";
 import BlogCard from "../components/BlogCard";
 import Pagination from "../components/Pagination";
 import { notifyError } from "../utils/toast";
@@ -12,26 +11,79 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("");
+  const [sortBy, setSortBy] = useState("recent");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Advanced filters
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [minLikes, setMinLikes] = useState("");
+  const [minComments, setMinComments] = useState("");
+  const [minReadTime, setMinReadTime] = useState("");
+  const [maxReadTime, setMaxReadTime] = useState("");
 
   const load = useCallback(
-    (p = page, q = search, g = genre) => {
-      const params = { page: p, q, minimal: true, signal: undefined };
+    (p = page, q = search, g = genre, sort = sortBy, filters = {}) => {
+      const params = {
+        page: p,
+        q,
+        minimal: true,
+        sort,
+        signal: undefined,
+      };
+
       if (g) params.genre = g;
+
+      // Add advanced filters
+      if (filters.dateFrom || dateFrom)
+        params.from = filters.dateFrom || dateFrom;
+      if (filters.dateTo || dateTo) params.to = filters.dateTo || dateTo;
+      if (filters.minLikes || minLikes)
+        params.minLikes = filters.minLikes || minLikes;
+      if (filters.minComments || minComments)
+        params.minComments = filters.minComments || minComments;
+      if (filters.minReadTime || minReadTime)
+        params.minRead = filters.minReadTime || minReadTime;
+      if (filters.maxReadTime || maxReadTime)
+        params.maxRead = filters.maxReadTime || maxReadTime;
+
       run((signal) => getBlogs({ ...params, signal })).catch((err) =>
         notifyError(err.message || "Failed to load blogs")
       );
     },
-    [run, page, search, genre]
+    [
+      run,
+      page,
+      search,
+      genre,
+      sortBy,
+      dateFrom,
+      dateTo,
+      minLikes,
+      minComments,
+      minReadTime,
+      maxReadTime,
+    ]
   );
 
   useEffect(() => {
-    load(1, search, genre); /* eslint-disable-next-line */
-  }, [search, genre]);
+    load(1, search, genre, sortBy); /* eslint-disable-next-line */
+  }, [
+    search,
+    genre,
+    sortBy,
+    dateFrom,
+    dateTo,
+    minLikes,
+    minComments,
+    minReadTime,
+    maxReadTime,
+  ]);
   useEffect(() => {
-    load(page, search, genre); /* eslint-disable-next-line */
+    load(page, search, genre, sortBy); /* eslint-disable-next-line */
   }, [page]);
   useEffect(() => {
-    load(1, search, genre); /* initial */
+    load(1, search, genre, sortBy); /* initial */
   }, []); // initial load
 
   const blogs = data?.data?.blogs || data?.blogs || []; // depending on interceptor shape
@@ -61,7 +113,7 @@ export default function HomePage() {
           className="space-y-4"
           role="search"
         >
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor="search" className="sr-only">
                 Search posts
@@ -90,7 +142,7 @@ export default function HomePage() {
                 />
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <div className="min-w-[140px]">
                 <label htmlFor="genre" className="sr-only">
                   Filter by genre
@@ -106,6 +158,25 @@ export default function HomePage() {
                   }}
                   className="input-base"
                 />
+              </div>
+              <div className="min-w-[140px]">
+                <label htmlFor="sortBy" className="sr-only">
+                  Sort by
+                </label>
+                <select
+                  id="sortBy"
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                    setPage(1);
+                  }}
+                  className="input-base"
+                >
+                  <option value="recent">Most Recent</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="popular">Most Popular</option>
+                  <option value="discussion">Most Discussion</option>
+                </select>
               </div>
               <button type="submit" className="btn-primary whitespace-nowrap">
                 <svg
@@ -123,22 +194,211 @@ export default function HomePage() {
                 </svg>
                 Search
               </button>
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="btn-secondary whitespace-nowrap"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+                  />
+                </svg>
+                Filters
+              </button>
             </div>
           </div>
 
-          {(search || genre) && (
-            <div className="flex items-center gap-2">
-              <span className="text-body-sm">Active filters:</span>
+          {/* Advanced Filters */}
+          {showAdvanced && (
+            <div className="border-t pt-4 space-y-4">
+              <h3 className="text-body-md font-medium text-gray-900 dark:text-gray-100">
+                Advanced Filters
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label
+                    htmlFor="dateFrom"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    From Date
+                  </label>
+                  <input
+                    id="dateFrom"
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => {
+                      setDateFrom(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="dateTo"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    To Date
+                  </label>
+                  <input
+                    id="dateTo"
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => {
+                      setDateTo(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="minLikes"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Min Likes
+                  </label>
+                  <input
+                    id="minLikes"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 10"
+                    value={minLikes}
+                    onChange={(e) => {
+                      setMinLikes(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="minComments"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Min Comments
+                  </label>
+                  <input
+                    id="minComments"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 5"
+                    value={minComments}
+                    onChange={(e) => {
+                      setMinComments(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="minReadTime"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Min Read Time (min)
+                  </label>
+                  <input
+                    id="minReadTime"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 2"
+                    value={minReadTime}
+                    onChange={(e) => {
+                      setMinReadTime(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="maxReadTime"
+                    className="block text-body-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Max Read Time (min)
+                  </label>
+                  <input
+                    id="maxReadTime"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 15"
+                    value={maxReadTime}
+                    onChange={(e) => {
+                      setMaxReadTime(e.target.value);
+                      setPage(1);
+                    }}
+                    className="input-base"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Active Filters Display */}
+          {(search ||
+            genre ||
+            sortBy !== "recent" ||
+            dateFrom ||
+            dateTo ||
+            minLikes ||
+            minComments ||
+            minReadTime ||
+            maxReadTime) && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-body-sm font-medium">Active filters:</span>
               {search && (
                 <span className="badge-primary">Search: "{search}"</span>
               )}
               {genre && <span className="badge-primary">Genre: {genre}</span>}
+              {sortBy !== "recent" && (
+                <span className="badge-secondary">
+                  Sort:{" "}
+                  {(() => {
+                    if (sortBy === "oldest") return "Oldest First";
+                    if (sortBy === "popular") return "Most Popular";
+                    return "Most Discussion";
+                  })()}
+                </span>
+              )}
+              {dateFrom && (
+                <span className="badge-secondary">From: {dateFrom}</span>
+              )}
+              {dateTo && <span className="badge-secondary">To: {dateTo}</span>}
+              {minLikes && (
+                <span className="badge-secondary">≥{minLikes} likes</span>
+              )}
+              {minComments && (
+                <span className="badge-secondary">≥{minComments} comments</span>
+              )}
+              {minReadTime && (
+                <span className="badge-secondary">≥{minReadTime}min read</span>
+              )}
+              {maxReadTime && (
+                <span className="badge-secondary">≤{maxReadTime}min read</span>
+              )}
               <button
                 type="button"
                 onClick={() => {
                   setQuery("");
                   setSearch("");
                   setGenre("");
+                  setSortBy("recent");
+                  setDateFrom("");
+                  setDateTo("");
+                  setMinLikes("");
+                  setMinComments("");
+                  setMinReadTime("");
+                  setMaxReadTime("");
                   setPage(1);
                 }}
                 className="btn-ghost btn-sm ml-2"
@@ -158,8 +418,8 @@ export default function HomePage() {
             <div className="skeleton h-4 w-20"></div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="card p-6 space-y-4">
+            {Array.from({ length: 6 }, (_, i) => i).map((id) => (
+              <div key={`loading-skeleton-${id}`} className="card p-6 space-y-4">
                 <div className="skeleton h-6 w-3/4"></div>
                 <div className="skeleton h-4 w-full"></div>
                 <div className="skeleton h-4 w-2/3"></div>
