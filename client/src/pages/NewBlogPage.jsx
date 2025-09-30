@@ -49,8 +49,8 @@ export default function NewBlogPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="space-y-8">
+    <div className="max-w-4xl mx-auto mobile-padding">
+      <div className="mobile-space lg:space-y-8">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-display-md text-gray-900 dark:text-gray-100 mb-4">
@@ -62,8 +62,11 @@ export default function NewBlogPage() {
         </div>
 
         {/* Form */}
-        <div className="card p-8">
-          <form onSubmit={onSubmit} className="space-y-8">
+        <div className="card mobile-padding lg:p-8">
+          <form
+            onSubmit={onSubmit}
+            className="mobile-form-spacing lg:space-y-8"
+          >
             {/* Title */}
             <div>
               <label

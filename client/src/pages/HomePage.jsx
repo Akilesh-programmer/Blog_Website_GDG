@@ -90,7 +90,7 @@ export default function HomePage() {
   const meta = data?.metadata;
 
   return (
-    <div className="space-y-8">
+    <div className="mobile-space lg:space-y-8">
       {/* Hero Section */}
       <div className="text-center py-8 md:py-12">
         <h1 className="text-display-lg text-gray-900 dark:text-gray-100 mb-4">
@@ -110,7 +110,7 @@ export default function HomePage() {
             setSearch(query.trim());
             setPage(1);
           }}
-          className="space-y-4"
+          className="mobile-form-spacing"
           role="search"
         >
           <div className="flex flex-col lg:flex-row gap-4">
@@ -142,7 +142,7 @@ export default function HomePage() {
                 />
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row mobile-gap">
               <div className="min-w-[140px]">
                 <label htmlFor="genre" className="sr-only">
                   Filter by genre
@@ -156,7 +156,7 @@ export default function HomePage() {
                     setGenre(e.target.value.trim());
                     setPage(1);
                   }}
-                  className="input-base"
+                  className="input-base touch-target"
                 />
               </div>
               <div className="min-w-[140px]">
@@ -170,7 +170,7 @@ export default function HomePage() {
                     setSortBy(e.target.value);
                     setPage(1);
                   }}
-                  className="input-base"
+                  className="input-base touch-target"
                 >
                   <option value="recent">Most Recent</option>
                   <option value="oldest">Oldest First</option>
@@ -178,7 +178,10 @@ export default function HomePage() {
                   <option value="discussion">Most Discussion</option>
                 </select>
               </div>
-              <button type="submit" className="btn-primary whitespace-nowrap">
+              <button
+                type="submit"
+                className="btn-primary whitespace-nowrap touch-target"
+              >
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -192,12 +195,13 @@ export default function HomePage() {
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-                Search
+                <span className="hidden sm:inline">Search</span>
+                <span className="sm:hidden">Go</span>
               </button>
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="btn-secondary whitespace-nowrap"
+                className="btn-secondary whitespace-nowrap touch-target"
               >
                 <svg
                   className="w-4 h-4"
@@ -212,18 +216,19 @@ export default function HomePage() {
                     d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
                   />
                 </svg>
-                Filters
+                <span className="hidden sm:inline">Filters</span>
+                <span className="sm:hidden">More</span>
               </button>
             </div>
           </div>
 
           {/* Advanced Filters */}
           {showAdvanced && (
-            <div className="border-t pt-4 space-y-4">
+            <div className="border-t pt-4 mobile-space">
               <h3 className="text-body-md font-medium text-gray-900 dark:text-gray-100">
                 Advanced Filters
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mobile-gap">
                 <div>
                   <label
                     htmlFor="dateFrom"
@@ -419,7 +424,10 @@ export default function HomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => i).map((id) => (
-              <div key={`loading-skeleton-${id}`} className="card p-6 space-y-4">
+              <div
+                key={`loading-skeleton-${id}`}
+                className="card p-6 space-y-4"
+              >
                 <div className="skeleton h-6 w-3/4"></div>
                 <div className="skeleton h-4 w-full"></div>
                 <div className="skeleton h-4 w-2/3"></div>

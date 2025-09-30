@@ -190,8 +190,8 @@ export default function BlogDetailPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <article className="space-y-8">
+    <div className="max-w-4xl mx-auto mobile-padding">
+      <article className="mobile-space lg:space-y-8">
         {/* Article Header */}
         <header className="space-y-6">
           {/* Title */}
@@ -252,12 +252,12 @@ export default function BlogDetailPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="flex flex-wrap mobile-gap pt-4 border-t border-gray-200 dark:border-gray-800">
             {/* Like Button */}
             <button
               onClick={actionHandlers.toggleLike}
               disabled={uiState.likeBusy || !user}
-              className={`btn-base flex items-center gap-2 ${
+              className={`btn-base touch-target flex items-center gap-2 ${
                 liked
                   ? "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-950/50 dark:text-red-400 dark:border-red-800"
                   : "btn-outline"
@@ -289,7 +289,7 @@ export default function BlogDetailPage() {
               <button
                 onClick={actionHandlers.toggleBookmark}
                 disabled={uiState.bookmarkBusy}
-                className={`btn-base flex items-center gap-2 ${
+                className={`btn-base touch-target flex items-center gap-2 ${
                   bookmarked
                     ? "bg-brand-50 text-brand-700 border-brand-200 hover:bg-brand-100 dark:bg-brand-950/50 dark:text-brand-400 dark:border-brand-800"
                     : "btn-outline"

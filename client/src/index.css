@@ -42,6 +42,8 @@
 		@apply rounded-lg px-4 py-2.5 transition-all duration-200;
 		@apply focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
 		@apply disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none;
+		/* Enhanced mobile touch targets */
+		@apply min-h-[44px] touch-manipulation;
 	}
 	
 	.btn-primary { 
@@ -110,6 +112,8 @@
 		@apply dark:bg-gray-900 dark:border-gray-600 dark:text-gray-100;
 		@apply dark:placeholder-gray-400 dark:focus:border-brand-400;
 		@apply disabled:opacity-60 disabled:cursor-not-allowed;
+		/* Enhanced mobile touch targets */
+		@apply min-h-[44px] text-base sm:text-sm;
 	}
 	
 	.input-error {
@@ -248,5 +252,56 @@
 	}
 	80%, 100% {
 		text-shadow: .25em 0 0 currentColor, .5em 0 0 currentColor;
+	}
+}
+
+/* Mobile-Specific Optimizations */
+@layer utilities {
+	/* Touch-friendly utilities */
+	.touch-target {
+		@apply min-h-[44px] min-w-[44px] touch-manipulation;
+	}
+	
+	.mobile-padding {
+		@apply px-4 sm:px-6 lg:px-8;
+	}
+	
+	.mobile-text-sizing {
+		@apply text-base sm:text-sm;
+	}
+	
+	/* Mobile spacing optimizations */
+	.mobile-gap {
+		@apply gap-3 sm:gap-4;
+	}
+	
+	.mobile-space {
+		@apply space-y-4 sm:space-y-6;
+	}
+	
+	/* Mobile form enhancements */
+	.mobile-form-spacing {
+		@apply space-y-4 sm:space-y-6;
+	}
+	
+	/* Safe area utilities for mobile */
+	.safe-area-padding {
+		padding-left: env(safe-area-inset-left);
+		padding-right: env(safe-area-inset-right);
+	}
+	
+	.safe-area-bottom {
+		padding-bottom: max(1rem, env(safe-area-inset-bottom));
+	}
+	
+	/* Improved mobile scrolling */
+	.mobile-scroll {
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
+	}
+	
+	/* Mobile-optimized shadows */
+	.mobile-shadow {
+		@apply shadow-sm sm:shadow-medium;
 	}
 }

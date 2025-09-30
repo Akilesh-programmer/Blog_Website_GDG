@@ -153,7 +153,10 @@ export default function RootLayout() {
           </div>
         )}
       </header>
-      <main className="flex-1 container-page py-8 md:py-12" id="main-content">
+      <main
+        className="flex-1 container-page py-8 md:py-12 safe-area-padding safe-area-bottom"
+        id="main-content"
+      >
         <Outlet />
       </main>
       <footer className="mt-16 py-12 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">

@@ -33,8 +33,8 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="space-y-8">
+    <div className="max-w-md mx-auto mobile-padding">
+      <div className="mobile-space lg:space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex-center text-white">

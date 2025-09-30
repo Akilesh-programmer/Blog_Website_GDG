@@ -44,7 +44,7 @@ export default function Pagination({ page, totalPages, onChange }) {
         <button
           disabled={prevDisabled}
           onClick={() => onChange(page - 1)}
-          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors touch-target ${
             prevDisabled
               ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -86,7 +86,7 @@ export default function Pagination({ page, totalPages, onChange }) {
               <button
                 key={pageNum}
                 onClick={() => onChange(pageNum)}
-                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors touch-target ${
                   isActive
                     ? "bg-brand-600 text-white shadow-sm"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -111,7 +111,7 @@ export default function Pagination({ page, totalPages, onChange }) {
         <button
           disabled={nextDisabled}
           onClick={() => onChange(page + 1)}
-          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors touch-target ${
             nextDisabled
               ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
