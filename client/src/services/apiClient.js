@@ -26,9 +26,9 @@ export const api = axios.create({
 });
 
 // Set up token from localStorage on initialization
-const token = localStorage.getItem('authToken');
+const token = localStorage.getItem("authToken");
 if (token) {
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 
 if (

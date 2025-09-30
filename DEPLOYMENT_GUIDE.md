@@ -7,6 +7,7 @@ The authentication issue has been resolved by switching from cookie-based to Bea
 ### Changes Made:
 
 1. **Frontend (Client)**:
+
    - ✅ Updated `apiClient.js` to use `withCredentials: false` and Authorization headers
    - ✅ Modified `AuthContext.jsx` to store JWT tokens in localStorage
    - ✅ Added automatic token setting in API requests

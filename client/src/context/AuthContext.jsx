@@ -15,14 +15,14 @@ import { api } from "../services/apiClient";
 import { notifyError, notifySuccess } from "../utils/toast";
 
 // Token management functions
-const getStoredToken = () => localStorage.getItem('authToken');
+const getStoredToken = () => localStorage.getItem("authToken");
 const setStoredToken = (token) => {
   if (token) {
-    localStorage.setItem('authToken', token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem("authToken", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    localStorage.removeItem('authToken');
-    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem("authToken");
+    delete api.defaults.headers.common["Authorization"];
   }
 };
 
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
       if (token) {
         try {
           // Set the token in axios headers
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
           // Verify token is still valid
           const res = await getMe();
           const u = res?.data?.user || res?.data?.data?.user || res?.data?.data; // shapes
@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
       const res = await apiLogin({ email, password });
       const u = res?.data?.user || res?.data?.data?.user || res?.data?.data;
       const token = res?.token;
-      
+
       setUser(u);
       if (token) {
         setStoredToken(token);
@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
       const res = await apiSignup({ name, email, password, passwordConfirm });
       const u = res?.data?.user || res?.data?.data?.user || res?.data?.data;
       const token = res?.token;
-      
+
       setUser(u);
       if (token) {
         setStoredToken(token);
