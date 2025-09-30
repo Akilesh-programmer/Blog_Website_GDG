@@ -22,6 +22,11 @@ const blogSchema = new mongoose.Schema(
       required: [true, "A blog post must have an author name"],
       trim: true,
     },
+    genre: {
+      type: String,
+      trim: true,
+      required: [true, 'A blog post must have a genre']
+    },
     // Reference to owning user (set automatically when authenticated user creates a blog)
     authorUser: {
       type: mongoose.Schema.ObjectId,

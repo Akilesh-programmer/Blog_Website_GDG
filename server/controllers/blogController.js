@@ -34,6 +34,11 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
     if (tags.length) filter.tags = { $in: tags };
   }
 
+  // Genre filtering (?genre=technology)
+  if (req.query.genre) {
+    filter.genre = req.query.genre.trim();
+  }
+
   // Basic search (?q=keyword) - case-insensitive title or content prefix/contains
   if (req.query.q) {
     const q = req.query.q.trim();
@@ -50,7 +55,7 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
 
   if (minimal) {
     docsQuery = docsQuery.select(
-      "title author createdAt slug estimatedReadTime tags"
+      "title author genre createdAt slug estimatedReadTime tags"
     );
   } else if (selectFields) {
     docsQuery = docsQuery.select(selectFields);
@@ -97,11 +102,11 @@ exports.filterBlogBody = (req, res, next) => {
   if (!req.body || typeof req.body !== "object") return next();
   const allowed = [
     "title",
-    "author",
     "content",
     "tags",
     "coverImage",
     "isPublished",
+    "genre",
   ];
   const filtered = {};
   allowed.forEach((f) => {
@@ -114,10 +119,10 @@ exports.filterBlogBody = (req, res, next) => {
 
 // If authenticated, attach current user as authorUser on creation
 exports.setAuthorFromUser = (req, _res, next) => {
-  if (req.user && !req.body.authorUser) {
+  if (req.user) {
     req.body.authorUser = req.user._id;
-    // Fallback: if no explicit author string provided, default to user name
-    if (!req.body.author && req.user.name) req.body.author = req.user.name;
+    // Always override author with current user's name
+    if (req.user.name) req.body.author = req.user.name;
   }
   next();
 };
