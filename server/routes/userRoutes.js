@@ -1,5 +1,6 @@
 const express = require('express');
 const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
 
 const router = express.Router();
 
@@ -11,10 +12,14 @@ router.get('/logout', authController.logout);
 // Protect all routes after this middleware
 router.use(authController.protect);
 
-// Example protected route (current user info placeholder)
+// Current user basic info
 router.get('/me', (req, res) => {
   res.status(200).json({ status: 'success', data: { user: req.user } });
 });
+
+// Bookmarks
+router.get('/bookmarks', userController.getMyBookmarks);
+router.post('/bookmarks/:blogId', userController.toggleBookmark);
 
 // Admin-only example (currently minimal; extend later)
 router.use(authController.restrictTo('admin'));
